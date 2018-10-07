@@ -1,0 +1,17 @@
+language: python
+os:
+- linux
+python:
+- 2.7
+- 3.6
+sudo: false
+install:
+- pip install -r requirements.txt
+script:
+- python -m wtools test
+notifications:
+  email:
+    recipients:
+    - info@pvgeo.org
+    on_success: never
+    on_failure: never
