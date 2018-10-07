@@ -1,6 +1,10 @@
 W-Tools
 =======
 
+.. image:: https://readthedocs.org/projects/wtools/badge/?version=latest
+   :target: https://wtools.readthedocs.io/en/latest/?badge=latest
+   :alt: Documentation Status
+
 .. image:: https://img.shields.io/badge/docs%20by-gendocs-blue.svg
    :target: https://gendocs.readthedocs.io/en/latest/?badge=latest)
    :alt: Documentation Built by gendocs
