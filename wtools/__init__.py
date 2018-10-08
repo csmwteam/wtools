@@ -1,4 +1,5 @@
 """wtools: a Python package for W-Team research needs"""
+from .geostats import *
 from .mesh import *
 from .plots import *
 
