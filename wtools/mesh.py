@@ -24,8 +24,16 @@ def meshgrid(x, y, z=None):
 
 def transpose(arr):
     """Transpose matrix from Cartesian to Earth Science coordinate system.
-    This is useful for UBC Meshgrids where +Z is down. Works forward and backward.
-    <i,j,k> to <j,i,-k>
+    This is useful for UBC Meshgrids where +Z is down.
+
+    Note:
+        Works forward and backward.
+
+    Args:
+        arr (ndarray): 3D NumPy array to transpose with ordering: <i,j,k>
+
+    Return:
+        ndarray: same array transposed from <i,j,k> to <j,i,-k>
     """
     if (len(arr.shape) != 3):
         raise RuntimeError('argument must have 3 dimensions.')
