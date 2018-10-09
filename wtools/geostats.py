@@ -48,7 +48,7 @@ def geoeas2numpy(datain, nx, ny=None, nz=None):
     Note:
       In 3D, z increases upwards
 
-    Important:
+    References:
         Originally implemented in MATLAB by:
             Phaedon Kyriakidis,
             Department of Geography,
@@ -134,7 +134,7 @@ def raster2structgrid(datain, gridspecs, imeas='covariogram', idisp=False):
       Author: Dennis Marcotte: Computers & Geosciences,
       > Vol. 22, No. 10, pp. 1175-1186, 1996.
 
-    Important:
+    References:
         Originally implemented in MATLAB by:
             Phaedon Kyriakidis,
             Department of Geography,
@@ -380,7 +380,7 @@ def suprts2modelcovFFT(CovMapExtFFT, ind1Ext, sf1Ext, ind2Ext, sf2Ext):
        np.ndarray: (nSup1 x nSup[1,2]) array with integrated covariances
 
 
-    Important:
+    References:
         Originally implemented in MATLAB by:
             Phaedon Kyriakidis,
             Department of Geography,
