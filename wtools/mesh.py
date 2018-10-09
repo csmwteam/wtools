@@ -32,7 +32,7 @@ def transpose(arr):
     return np.flip(np.swapaxes(arr, 0, 1), 2)
 
 
-def saveUBC(fname, dx, dy, dz, models, header='Data!'):
+def saveUBC(fname, x, y, z, models, header='Data', sz=False, origin=(0.0, 0.0, 0.0)):
     """Saves a 3D gridded array with spacing reference to the UBC mesh/model format.
     Use `PVGeo`_ to visualize this data. For more information on the UBC mesh
     format, reference the `GIFtoolsCookbook`_ website. This method assumes your
@@ -42,12 +42,16 @@ def saveUBC(fname, dx, dy, dz, models, header='Data!'):
     .. _GIFtoolsCookbook: https://giftoolscookbook.readthedocs.io/en/latest/content/fileFormats/mesh3Dfile.html
 
     Args:
-        fname (str): the string file name of the mesh file. Model files will be saved next to this file.
-        x (np.ndarray): a 1D array of unique coordinates along the X axis
-        y (np.ndarray): a 1D array of unique coordinates along the Y axis
-        z (np.ndarray): a 1D array of unique coordinates along the Z axis
-        models (dict): a dictionary of models. Key is model name and value is a 3D array with dimensions <x,y,z> containing cell data.
+        fname (str): the string file name of the mesh file. Model files will be
+            saved next to this file.
+        x (ndarray or float): a 1D array of unique coordinates along the X axis
+        y (ndarray or float): a 1D array of unique coordinates along the Y axis
+        z (ndarray or float): a 1D array of unique coordinates along the Z axis
+        models (dict): a dictionary of models. Key is model name and value is a
+            3D array with dimensions <x,y,z> containing cell data.
         header (str): a string header for your mesh/model files
+        sx (bool): flag for whether to treat the (``x``, ``y``, ``z``) args as
+            cell sizes
 
     Example:
         >>> import numpy as np
@@ -68,13 +72,36 @@ def saveUBC(fname, dx, dy, dz, models, header='Data!'):
     def arr2str(arr):
             return ' '.join(map(str, arr))
 
-    # Convert coordinates to cell sizes
-    dx = np.diff(x)
-    dy = np.diff(y)
-    dz = np.diff(z)
+    shp = models.items()[0][1].shape
+    for n, m in models.items():
+        if m.shape != shp:
+            raise RuntimeError('dimension mismatch in models.')
 
-    nx, ny, nz = len(dx), len(dy), len(dz)
-    ox, oy, oz = np.min(x), np.min(y), np.max(z)
+    nx, ny, nz = shp
+
+    # Convert coordinates to cell sizes
+
+    if sz:
+        if isinstance(x, (float, int)):
+            dx = np.full(nx, x)
+        else:
+            dx = x
+        if isinstance(y, (float, int)):
+            dy = np.full(ny, y)
+        else:
+            dy = y
+        if isinstance(x, (float, int)):
+            dz = np.full(nz, z)
+        else:
+            dz = z
+        ox, oy, oz = origin
+    else:
+        dx = np.diff(x)
+        dy = np.diff(y)
+        dz = np.diff(z)
+        ox, oy, oz = np.min(x), np.min(y), np.max(z)
+
+
 
 
     if '.msh' not in fname:
