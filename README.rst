@@ -10,8 +10,8 @@ W-Tools
    :alt: Documentation Built by gendocs
 
 .. image:: https://img.shields.io/github/stars/csmwteam/wtools.svg?style=social&label=Stars
-  :target: https://github.com/csmwteam/wtools
-  :alt: GitHub
+   :target: https://github.com/csmwteam/wtools
+   :alt: GitHub
 
 This Python package provides a set of convenient tools we use in the W-Team /
 Data to Decisions research group at the Colorado School of Mines.
