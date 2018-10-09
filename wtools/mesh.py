@@ -52,6 +52,7 @@ def saveUBC(fname, x, y, z, models, header='Data', sz=False, origin=(0.0, 0.0, 0
         header (str): a string header for your mesh/model files
         sx (bool): flag for whether to treat the (``x``, ``y``, ``z``) args as
             cell sizes
+        origin (tuple(float)): optional origin value used only if ``sz==True``
 
     Example:
         >>> import numpy as np
