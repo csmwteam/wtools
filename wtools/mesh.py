@@ -45,6 +45,10 @@ def saveUBC(fname, x, y, z, models, header='Data', widths=False, origin=(0.0, 0.
     Use `PVGeo`_ to visualize this data. For more information on the UBC mesh
     format, reference the `GIFtoolsCookbook`_ website.
 
+    Saves out a mesh file named {``fname``}.msh and a model file for every
+    key/value pair in the ``models`` argument (key is file extension for model
+    file and value is the data.
+
     Note:
         This method assumes your mesh and data are defined on a normal cartesian
         system: <x,y,z>
@@ -56,13 +60,13 @@ def saveUBC(fname, x, y, z, models, header='Data', widths=False, origin=(0.0, 0.
         fname (str): the string file name of the mesh file. Model files will be
             saved next to this file.
         x (ndarray or float): a 1D array of unique coordinates along the X axis,
-            float for uniform cell widths, or an  array with ``widths==True``
+            float for uniform cell widths, or an array with ``widths==True``
             to treat as cell spacing on X axis
         y (ndarray or float): a 1D array of unique coordinates along the Y axis,
-            float for uniform cell widths, or an  array with ``widths==True``
+            float for uniform cell widths, or an array with ``widths==True``
             to treat as cell spacing on Y axis
         z (ndarray or float): a 1D array of unique coordinates along the Z axis,
-            float for uniform cell widths, or an  array with ``widths==True``
+            float for uniform cell widths, or an array with ``widths==True``
             to treat as cell spacing on Z axis
         models (dict): a dictionary of models. Key is model name and value is a
             3D array with dimensions <x,y,z> containing cell data.
@@ -72,11 +76,6 @@ def saveUBC(fname, x, y, z, models, header='Data', widths=False, origin=(0.0, 0.
         origin (tuple(float)): optional origin value used if ``widths==True``,
             or used on a component basis if any of the ``x``, ``y``, or ``z``
             args are scalars.
-
-    Return:
-        None: saves out a mesh file named {``fname``}.msh and a model file for
-            every key/value pair in the ``models`` argument (key is file
-            extension for model file and value is the data.
 
     Examples:
         >>> import numpy as np
