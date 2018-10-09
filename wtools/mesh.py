@@ -24,7 +24,7 @@ def meshgrid(x, y, z=None):
 
 def transpose(arr):
     """Transpose matrix from Cartesian to Earth Science coordinate system.
-    This is useful for UBC Meshgrids where +Z is downself.
+    This is useful for UBC Meshgrids where +Z is down. Works forward and backward.
     <i,j,k> to <j,i,-k>
     """
     if (len(arr.shape) != 3):
@@ -32,11 +32,14 @@ def transpose(arr):
     return np.flip(np.swapaxes(arr, 0, 1), 2)
 
 
-def saveUBC(fname, x, y, z, models, header='Data', sz=False, origin=(0.0, 0.0, 0.0)):
-    """Saves a 3D gridded array with spacing reference to the UBC mesh/model format.
+def saveUBC(fname, x, y, z, models, header='Data', widths=False, origin=(0.0, 0.0, 0.0)):
+    """Saves a 3D gridded array with spatail reference to the UBC mesh/model format.
     Use `PVGeo`_ to visualize this data. For more information on the UBC mesh
-    format, reference the `GIFtoolsCookbook`_ website. This method assumes your
-    mesh and data are defined on a normal cartesian system: <x,y,z>
+    format, reference the `GIFtoolsCookbook`_ website.
+
+    Note:
+        This method assumes your mesh and data are defined on a normal cartesian
+        system: <x,y,z>
 
     .. _PVGeo: http://pvgeo.org
     .. _GIFtoolsCookbook: https://giftoolscookbook.readthedocs.io/en/latest/content/fileFormats/mesh3Dfile.html
@@ -44,17 +47,30 @@ def saveUBC(fname, x, y, z, models, header='Data', sz=False, origin=(0.0, 0.0, 0
     Args:
         fname (str): the string file name of the mesh file. Model files will be
             saved next to this file.
-        x (ndarray or float): a 1D array of unique coordinates along the X axis
-        y (ndarray or float): a 1D array of unique coordinates along the Y axis
-        z (ndarray or float): a 1D array of unique coordinates along the Z axis
+        x (ndarray or float): a 1D array of unique coordinates along the X axis,
+            float for uniform cell widths, or an  array with ``widths==True``
+            to treat as cell spacing on X axis
+        y (ndarray or float): a 1D array of unique coordinates along the Y axis,
+            float for uniform cell widths, or an  array with ``widths==True``
+            to treat as cell spacing on Y axis
+        z (ndarray or float): a 1D array of unique coordinates along the Z axis,
+            float for uniform cell widths, or an  array with ``widths==True``
+            to treat as cell spacing on Z axis
         models (dict): a dictionary of models. Key is model name and value is a
             3D array with dimensions <x,y,z> containing cell data.
         header (str): a string header for your mesh/model files
-        sx (bool): flag for whether to treat the (``x``, ``y``, ``z``) args as
-            cell sizes
-        origin (tuple(float)): optional origin value used only if ``sz==True``
+        widths (bool): flag for whether to treat the (``x``, ``y``, ``z``) args as
+            cell sizes/widths
+        origin (tuple(float)): optional origin value used if ``widths==True``,
+            or used on a component basis if any of the ``x``, ``y``, or ``z``
+            args are scalars.
 
-    Example:
+    Return:
+        None: saves out a mesh file named {``fname``}.msh and a model file for
+            every key/value pair in the ``models`` argument (key is file
+            extension for model file and value is the data.
+
+    Examples:
         >>> import numpy as np
         >>> # Create the unique coordinates along each axis
         >>> x = np.linspace(0, 100, 11)
@@ -67,48 +83,72 @@ def saveUBC(fname, x, y, z, models, header='Data', sz=False, origin=(0.0, 0.0, 0
         >>> fname = 'test'
         >>> # Perfrom the write out
         >>> saveUBC(fname, x, y, z, models, header='A simple model')
+        >>> # Two files saved: 'test.msh' and 'test.foo'
+
+        >>> # Uniform cell sizes
+        >>> d = np.random.random(1000).reshape((10, 10, 10))
+        >>> v = np.random.random(1000).reshape((10, 10, 10))
+        >>> models = dict(den=d, vel=v)
+        >>> saveUBC('volume', 25, 25, 2, models, widths=True, origin=(200.0, 100.0, 500.0))
+        >>> # Three files saved: 'volume.msh', 'volume.den', and 'volume.vel'
 
 
     """
     def arr2str(arr):
             return ' '.join(map(str, arr))
 
-    shp = models.items()[0][1].shape
+    shp = list(models.items())[0][1].shape
     for n, m in models.items():
         if m.shape != shp:
             raise RuntimeError('dimension mismatch in models.')
 
+
     nx, ny, nz = shp
 
-    # Convert coordinates to cell sizes
+    def _getWidths(nw, w, widths=False):
+        # Convert scalars if necessary
+        if isinstance(w, (float, int)):
+            dw = np.full(nw, w)
+            return dw, None
+        # Now get cell widths
+        if widths:
+            dw = w
+            return dw, None
+        dw = np.diff(w)
+        o = np.min(w)
+        return dw, o
 
-    if sz:
-        if isinstance(x, (float, int)):
-            dx = np.full(nx, x)
-        else:
-            dx = x
-        if isinstance(y, (float, int)):
-            dy = np.full(ny, y)
-        else:
-            dy = y
-        if isinstance(x, (float, int)):
-            dz = np.full(nz, z)
-        else:
-            dz = z
+    # Get proper cell widths
+    dx, ox = _getWidths(nx, x, widths=widths)
+    dy, oy = _getWidths(ny, y, widths=widths)
+    dz, oz = _getWidths(nz, z, widths=widths)
+
+
+    # Check lengths of cell widths against model space shape
+    if len(dx) != nx:
+        raise RuntimeError('X cells size does not match data.')
+    if len(dy) != ny:
+        raise RuntimeError('Y cells size does not match data.')
+    if len(dz) != nz:
+        raise RuntimeError('Z cells size does not match data.')
+
+
+    # Check the origin
+    if widths:
         ox, oy, oz = origin
     else:
-        dx = np.diff(x)
-        dy = np.diff(y)
-        dz = np.diff(z)
-        ox, oy, oz = np.min(x), np.min(y), np.max(z)
+        # Now check set ox, oy, oz
+        if ox is None: ox = origin[0]
+        if oy is None: oy = origin[1]
+        if oz is None: oz = origin[2]
 
 
 
-
+    # Perfrom the write out:
     if '.msh' not in fname:
         fname += '.msh'
 
-    # Save out the data to UBC Tensor Mesh format
+    # Save the mesh to UBC Tensor Mesh format
     with open(fname, 'w') as f:
         f.write('! %s\n' % header)
         f.write('%d %d %d\n' % (nx, ny, nz))
