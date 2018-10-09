@@ -72,11 +72,11 @@ def saveUBC(fname, x, y, z, models, header='Data', widths=False, origin=(0.0, 0.
 
     Examples:
         >>> import numpy as np
-        >>> # Create the unique coordinates along each axis
+        >>> # Create the unique coordinates along each axis : 11 nodes on each axis
         >>> x = np.linspace(0, 100, 11)
         >>> y = np.linspace(220, 500, 11)
         >>> z = np.linspace(0, 50, 11)
-        >>> # Create some model data
+        >>> # Create some model data: 10 cells on each axis
         >>> arr = np.array([i*j*k for i in range(10) for j in range(10) for k in range(10)]).reshape(10, 10, 10)
         >>> models = dict( foo=arr )
         >>> # Define the name of the file
