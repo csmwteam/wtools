@@ -25,7 +25,8 @@ To get started using ``wtools``, clone this project:
 
     $ git clone https://github.com/csmwteam/wtools.git
 
-Then go into that clone development directory and perform a loval installation via ``pip`` in your active virtual environment:
+Then go into that cloned development directory and perform a local installation
+via ``pip`` in your active virtual environment:
 
 .. code-block:: bash
 
@@ -35,9 +36,11 @@ Then go into that clone development directory and perform a loval installation v
 Contributing
 ------------
 
-Do you want to add features? Then go ahead and make commits to the project and push them to GitHub and create a Pull Request!
+Do you want to add features? Then go ahead and make commits to the project and
+push them to GitHub and create a Pull Request!
 
-In your virtual environment, make sure you have all of the proper dependancies installed:
+In your virtual environment, make sure you have all of the proper dependancies
+installed:
 
 .. code-block:: bash
 
