@@ -93,6 +93,7 @@ def saveUBC(fname, x, y, z, models, header='Data', widths=False, origin=(0.0, 0.
         >>> saveUBC(fname, x, y, z, models, header='A simple model')
         >>> # Two files saved: 'test.msh' and 'test.foo'
 
+        >>> import numpy as np
         >>> # Uniform cell sizes
         >>> d = np.random.random(1000).reshape((10, 10, 10))
         >>> v = np.random.random(1000).reshape((10, 10, 10))
