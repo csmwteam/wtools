@@ -35,7 +35,7 @@ via ``pip`` in your active virtual environment:
 .. code-block:: bash
 
     $ cd wtools
-    $ pip install .
+    $ pip install -e .
 
 Contributing
 ------------

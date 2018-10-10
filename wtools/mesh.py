@@ -1,5 +1,6 @@
-"""``mesh``: This module provides numerous methods and classes for discretizing data
-in a convienant way that makes sense for our spatially refeerenced data/models.
+"""``mesh``: This module provides numerous methods and classes for discretizing
+data in a convienant way that makes sense for our spatially referenced
+data/models.
 """
 
 __all__ = [
@@ -13,6 +14,10 @@ import numpy as np
 def meshgrid(x, y, z=None):
     """Use this convienance method for your meshgrid needs. This ensures that
     we always use <ij> indexing to stay consistant with Cartesian grids.
+
+    This simply provides a wrapper for ``np.meshgrid`` ensuring we always use
+    ``indexing='ij'`` which makes sense for typical Cartesian coordinate
+    systems (<x,y,z>).
 
     Note:
         This method handles 2D or 3D grids.
@@ -45,11 +50,7 @@ def saveUBC(fname, x, y, z, models, header='Data', widths=False, origin=(0.0, 0.
     Use `PVGeo`_ to visualize this data. For more information on the UBC mesh
     format, reference the `GIFtoolsCookbook`_ website.
 
-    Saves out a mesh file named {``fname``}.msh and a model file for every
-    key/value pair in the ``models`` argument (key is file extension for model
-    file and value is the data.
-
-    Note:
+    Warning:
         This method assumes your mesh and data are defined on a normal cartesian
         system: <x,y,z>
 
@@ -76,6 +77,11 @@ def saveUBC(fname, x, y, z, models, header='Data', widths=False, origin=(0.0, 0.
         origin (tuple(float)): optional origin value used if ``widths==True``,
             or used on a component basis if any of the ``x``, ``y``, or ``z``
             args are scalars.
+
+    Yields:
+        Saves out a mesh file named {``fname``}.msh and a model file for every
+        key/value pair in the ``models`` argument (key is file extension for model
+        file and value is the data.
 
     Examples:
         >>> import numpy as np
