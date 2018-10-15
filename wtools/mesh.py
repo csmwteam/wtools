@@ -4,12 +4,15 @@ data/models.
 """
 
 __all__ = [
+    'GriddedData',
     'meshgrid',
     'transpose',
     'saveUBC',
 ]
 
 import numpy as np
+import properties
+
 
 def meshgrid(x, y, z=None):
     """Use this convienance method for your meshgrid needs. This ensures that
@@ -181,3 +184,84 @@ def saveUBC(fname, x, y, z, models, header='Data', widths=False, origin=(0.0, 0.
             f.write('%s\n' % '\n'.join(map(str, transpose(data).flatten())))
 
     return None
+
+
+class GriddedData(properties.HasProperties):
+    """A data structure to store a model space discretization and different
+    attributes of that model space.
+    """
+    models = properties.Dictionary(
+        'The volumetric data as a 3D NumPy arrays in <X,Y,Z> or <i,j,k> ' +
+        'coordinates. Each key value pair represents a different model for ' +
+        'the gridded model space. Keys will be treated as the string name of ' +
+        'the model.',
+        key_prop=properties.String('Model name'),
+        value_prop=properties.Array(
+            'The volumetric data as a 3D NumPy array in <X,Y,Z> or <i,j,k> coordinates.',
+            shape=('*','*','*'))
+    )
+    xcoords = properties.Array(
+        'The cell center coordinates along the X axis.',
+        shape=('*',),
+        required=False,
+    )
+    ycoords = properties.Array(
+        'The cell center coordinates along the Y axis.',
+        shape=('*',),
+        required=False,
+    )
+    zcoords = properties.Array(
+        'The cell center coordinates along the Z axis.',
+        shape=('*',),
+        required=False,
+    )
+
+    def saveUBC(self, fname):
+        """Save the grid in the UBC mesh format.
+        """
+        self.validate()
+        # Half cell widths
+        dx = np.unique(np.diff(self.xcoords))[0] / 2.
+        dy = np.unique(np.diff(self.ycoords))[0] / 2.
+        dz = np.unique(np.diff(self.zcoords))[0] / 2.
+        # Nodes
+        x = np.arange(self.xcoords.min()-dx, self.xcoords.max()+2*dx, 2*dx)
+        y = np.arange(self.ycoords.min()-dy, self.ycoords.max()+2*dy, 2*dy)
+        z = np.arange(self.zcoords.min()-dz, self.zcoords.max()+2*dz, 2*dz)
+        return saveUBC(fname, x, y, z, self.models)
+
+    def todict(self, key):
+        """Export this object as a dictionary compatible with the interactive
+        plotting routine. Only exports a single model attribute.
+
+        Args:
+            key (str): the model key to export
+
+        Return:
+            dict:
+                Dictionary with key/value pairs ready for interactive
+                plotting routines.
+        """
+        self.validate()
+        d = {'xc': self.xcoords,
+             'yc': self.ycoords,
+             'zc': self.zcoords,
+             'data': self.models[key],
+            }
+        return d
+
+    def validate(self):
+        properties.HasProperties.validate(self)
+        # Check the models
+        shp = list(self.models.values())[0].shape
+        for k, d in self.models.items():
+            if d.shape != shp:
+                raise properties.ValidationError('Validation Failed: dimesnion mismatch between models.')
+        # Now create tensors if not present
+        if self.xcoords is None:
+            self.xcoords = np.arange(shp[0])
+        if self.ycoords is None:
+            self.ycoords = np.arange(shp[1])
+        if self.zcoords is None:
+            self.zcoords = np.arange(shp[2])
+        return True
