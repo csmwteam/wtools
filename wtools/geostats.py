@@ -2,7 +2,7 @@ __all__ = [
     'GridSpec',
     'geoeas2numpy',
     'geoeas2numpyGS',
-    'raster2structgrid',
+    'raster2structgrid_old',
     'suprts2modelcovFFT',
 ]
 
@@ -102,7 +102,7 @@ def geoeas2numpyGS(datain, gridspecs):
 ################################################################################
 
 
-def raster2structgrid(datain, gridspecs, imeas='covariogram', idisp=False):
+def raster2structgrid_old(datain, gridspecs, imeas='covariogram', idisp=False):
     """Create an auto-variogram or auto-covariance map from 1D or 2D rasters.
     This computes auto-variogram or auto-covariance maps from
     1D or 2D rasters. This function computes variograms/covariances in the
