@@ -1,7 +1,7 @@
 """wtools: a Python package for W-Team research needs"""
-from . import geostats
-from . import mesh
-from . import plots
+from .mesh import *
+from .plots import *
+from .geostats import *
 
 __version__ = '0.0.1'
 __author__ = 'Bane Sullivan'
