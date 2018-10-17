@@ -2,7 +2,6 @@
 from .mesh import *
 from .plots import *
 from .geostats import *
-from .raster2structgrid_2 import *
 
 __version__ = '0.0.1'
 __author__ = 'Bane Sullivan'

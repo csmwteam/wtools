@@ -10,6 +10,8 @@ __all__ = [
     'GriddedData',
 ]
 
+__displayname__ = 'Mesh Tools'
+
 import numpy as np
 import properties
 
