@@ -222,18 +222,8 @@ class GriddedData(properties.HasProperties):
         >>> grid.validate() # Make sure the data object was created successfully
         True
 
-        >>> # Or you could create a model with a defined spatial reference
-        >>> nx, ny, nz = 18, 24, 20
-        >>> x = np.linspace(20, 200, nx)
-        >>> y = np.linspace(20, 500, ny)
-        >>> z = np.linspace(0, 1000, nz)
-        >>> grid = wtools.GriddedData(models={
-                                'density': np.random.rand(nx,ny,nz)
-                                },
-                                xcoords=x,
-                                ycoords=y,
-                                zcoords=z)
-
+    Note:
+        See example Jupyter notebooks under the `examples` directory
 
     """
     models = properties.Dictionary(
