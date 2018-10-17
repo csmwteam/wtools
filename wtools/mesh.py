@@ -246,68 +246,110 @@ class GriddedData(properties.HasProperties):
             'The volumetric data as a 3D NumPy array in <X,Y,Z> or <i,j,k> coordinates.',
             shape=('*','*','*'))
     )
-    xcoords = properties.Array(
-        'The cell center coordinates along the X axis.',
+
+    xtensor = properties.Array(
+        'Tensor cell widths, x-direction',
         shape=('*',),
-        required=False,
+        dtype=(float, int)
     )
-    ycoords = properties.Array(
-        'The cell center coordinates along the Y axis.',
+
+    ytensor = properties.Array(
+        'Tensor cell widths, y-direction',
         shape=('*',),
-        required=False,
+        dtype=(float, int)
     )
-    zcoords = properties.Array(
-        'The cell center coordinates along the Z axis.',
+
+    ztensor = properties.Array(
+        'Tensor cell widths, z-direction',
         shape=('*',),
-        required=False,
+        dtype=(float, int)
     )
+
+    origin = properties.Vector3(
+        'The lower southwest corner of the data volume.',
+        default=[0., 0., 0.],
+    )
+
+    @property
+    def num_nodes(self):
+        """Number of nodes (vertices)"""
+        return ((len(self.xtensor)+1) * (len(self.ytensor)+1) *
+                (len(self.ztensor)+1))
+
+    @property
+    def num_cells(self):
+        """Number of cells"""
+        return len(self.xtensor) * len(self.ytensor) * len(self.ztensor)
+
+    @property
+    def shape(self):
+        return ( len(self.xtensor), len(self.ytensor), len(self.ztensor))
+
+    @property
+    def xnodes(self):
+        """The node coordinates along the X-axis"""
+        ox, oy, oz = self.origin
+        x = ox + np.cumsum(self.xtensor)
+        return np.insert(x, 0, ox)
+
+    @property
+    def ynodes(self):
+        """The node coordinates along the Y-axis"""
+        ox, oy, oz = self.origin
+        y = oy + np.cumsum(self.ytensor)
+        return np.insert(y, 0, oy)
+
+    @property
+    def znodes(self):
+        """The node coordinates along the Z-axis"""
+        ox, oy, oz = self.origin
+        z = oz + np.cumsum(self.ztensor)
+        return np.insert(z, 0, oz)
+
+    def getNodePoints(self):
+        """Get ALL nodes in the gridded volume as an XYZ point set"""
+        # Build out all nodes in the mesh
+        xx, yy, zz = np.meshgrid(self.xnodes, self.ynodes, self.znodes, indexing='ij')
+        return np.stack((xx.flatten(), yy.flatten(), zz.flatten())).T
+
+    @property
+    def xcenters(self):
+        """The cell center coordinates along the X-axis"""
+        xn = self.xnodes
+        xc = [xn[i] + self.xtensor[i]/2. for i in range(len(self.xtensor))]
+        return np.array(xc)
+
+    @property
+    def ycenters(self):
+        """The cell center coordinates along the Y-axis"""
+        yn = self.ynodes
+        yc = [yn[i] + self.ytensor[i]/2. for i in range(len(self.ytensor))]
+        return np.array(yc)
+
+    @property
+    def zcenters(self):
+        """The cell center coordinates along the Z-axis"""
+        zn = self.znodes
+        zc = [zn[i] + self.ztensor[i]/2. for i in range(len(self.ztensor))]
+        return np.array(zc)
 
     def saveUBC(self, fname):
-        """Save the grid in the UBC mesh format.
-        """
+        """Save the grid in the UBC mesh format."""
         self.validate()
-        # Half cell widths
-        dx = np.unique(np.diff(self.xcoords))[0] / 2.
-        dy = np.unique(np.diff(self.ycoords))[0] / 2.
-        dz = np.unique(np.diff(self.zcoords))[0] / 2.
-        # Nodes
-        x = np.arange(self.xcoords.min()-dx, self.xcoords.max()+2*dx, 2*dx)
-        y = np.arange(self.ycoords.min()-dy, self.ycoords.max()+2*dy, 2*dy)
-        z = np.arange(self.zcoords.min()-dz, self.zcoords.max()+2*dz, 2*dz)
-        return saveUBC(fname, x, y, z, self.models)
+        return saveUBC(fname, self.xnodes, self.ynodes, self.znodes, self.models)
 
-    def todict(self, key):
-        """Export this object as a dictionary compatible with the interactive
-        plotting routine. Only exports a single model attribute.
-
-        Args:
-            key (str): the model key to export
-
-        Return:
-            dict:
-                Dictionary with key/value pairs ready for interactive
-                plotting routines.
-        """
-        self.validate()
-        d = {'xc': self.xcoords,
-             'yc': self.ycoords,
-             'zc': self.zcoords,
-             'data': self.models[key],
-            }
-        return d
 
     def validate(self):
-        properties.HasProperties.validate(self)
         # Check the models
         shp = list(self.models.values())[0].shape
         for k, d in self.models.items():
             if d.shape != shp:
                 raise properties.ValidationError('Validation Failed: dimesnion mismatch between models.')
         # Now create tensors if not present
-        if self.xcoords is None:
-            self.xcoords = np.arange(shp[0])
-        if self.ycoords is None:
-            self.ycoords = np.arange(shp[1])
-        if self.zcoords is None:
-            self.zcoords = np.arange(shp[2])
-        return True
+        if self.xtensor is None:
+            self.xtensor = np.ones(shp[0])
+        if self.ytensor is None:
+            self.ytensor = np.ones(shp[1])
+        if self.ztensor is None:
+            self.ztensor = np.ones(shp[2])
+        return properties.HasProperties.validate(self)
