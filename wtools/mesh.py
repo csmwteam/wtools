@@ -4,10 +4,10 @@ data/models.
 """
 
 __all__ = [
-    'GriddedData',
     'meshgrid',
     'transpose',
     'saveUBC',
+    'GriddedData',
 ]
 
 import numpy as np
@@ -24,6 +24,18 @@ def meshgrid(x, y, z=None):
 
     Note:
         This method handles 2D or 3D grids.
+
+    Example:
+        >>> import wtools
+        >>> import numpy as np
+        >>> x = np.arange(20, 200, 10)
+        >>> y = np.arange(20, 500, 20)
+        >>> z = np.arange(0, 1000, 50)
+        >>> xx, yy, zz = wtools.meshgrid(x, y, z)
+        >>> # Now check that axii are ordered correctly
+        >>> assert(xx.shape[0] == len(x))
+        >>> assert(xx.shape[1] == len(y))
+        >>> assert(xx.shape[2] == len(z))
     """
     if z is not None:
         return np.meshgrid(x, y, z, indexing='ij')
@@ -42,6 +54,13 @@ def transpose(arr):
 
     Return:
         ndarray: same array transposed from <i,j,k> to <j,i,-k>
+
+    Example:
+        >>> import wtools
+        >>> import numpy as np
+        >>> model = np.random.random(1000).reshape((10, 20, 5))
+        >>> wtools.transpose(model).shape
+        (20, 10, 5)
     """
     if (len(arr.shape) != 3):
         raise RuntimeError('argument must have 3 dimensions.')
@@ -189,6 +208,31 @@ def saveUBC(fname, x, y, z, models, header='Data', widths=False, origin=(0.0, 0.
 class GriddedData(properties.HasProperties):
     """A data structure to store a model space discretization and different
     attributes of that model space.
+
+    Example:
+        >>> import wtools
+        >>> import numpy as np
+        >>> models = {
+            'rand': np.random.random(1000).reshape((10,10,10)),
+            'spatial': np.arange(1000).reshape((10,10,10)),
+            }
+        >>> grid = wtools.GriddedData(models=models)
+        >>> grid.validate() # Make sure the data object was created successfully
+        True
+
+        >>> # Or you could create a model with a defined spatial reference
+        >>> nx, ny, nz = 18, 24, 20
+        >>> x = np.linspace(20, 200, nx)
+        >>> y = np.linspace(20, 500, ny)
+        >>> z = np.linspace(0, 1000, nz)
+        >>> grid = wtools.GriddedData(models={
+                                'density': np.random.rand(nx,ny,nz)
+                                },
+                                xcoords=x,
+                                ycoords=y,
+                                zcoords=z)
+
+
     """
     models = properties.Dictionary(
         'The volumetric data as a 3D NumPy arrays in <X,Y,Z> or <i,j,k> ' +

@@ -1,6 +1,6 @@
 """wtools: a Python package for W-Team research needs"""
-from . import mesh
-from . import plots
+from .mesh import *
+from .plots import *
 
 __version__ = '0.0.1'
 __author__ = 'Bane Sullivan'
