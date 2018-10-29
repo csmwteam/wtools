@@ -37,6 +37,8 @@ via ``pip`` in your active virtual environment:
     $ cd wtools
     $ pip install -e .
 
+Then be sure to add the ``wtools`` repository directory to your `PYTHONPATH`.
+
 Contributing
 ------------
 

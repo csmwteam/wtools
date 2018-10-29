@@ -1,4 +1,4 @@
-from base import TestBase
+import unittest
 import shutil
 import tempfile
 import os
@@ -6,18 +6,16 @@ import numpy as np
 
 
 # Functionality to test:
-#import sys
-#sys.path.append('/Users/bane/Documents/school/Masters/csm-wteam-github/wtools/')
 from wtools.mesh import *
 
 RTOL = 0.000001
 
-class TestsaveUBC(TestBase):
+class TestsaveUBC(unittest.TestCase):
     """
     Test `saveUBC`: A file I/O method
     """
     def setUp(self):
-        TestBase.setUp(self)
+        unittest.TestCase.setUp(self)
         # Create a temporary directory
         self.test_dir = tempfile.mkdtemp()
         self.fname = os.path.join(self.test_dir, 'test')
@@ -26,7 +24,7 @@ class TestsaveUBC(TestBase):
     def tearDown(self):
         # Remove the test data directory after the test
         shutil.rmtree(self.test_dir)
-        TestBase.tearDown(self)
+        unittest.TestCase.tearDown(self)
 
     def test_coords(self):
         # Create the unique coordinates along each axis
@@ -55,7 +53,7 @@ class TestsaveUBC(TestBase):
         return
 
 
-class TestTranspose(TestBase):
+class TestTranspose(unittest.TestCase):
     """
     Test `transpose`: A coordinate transform method
     """

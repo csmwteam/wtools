@@ -147,7 +147,7 @@ class OrthographicSlicer():
     Args:
         plt (handle): An active plotting handle. This allows us to use the
             plotted result after the routine.
-        grid (GriddedData): The grid to plot
+        grid (Grid): The grid to plot
         model (str): The model name to plot (the attribute data)
         x, y, or z (int or float): the constant values to slice against.
 

@@ -20,7 +20,7 @@ sys.path.insert(0, '/Users/bane/Documents/OpenGeoVis/Software/gendocs/')
 import wtools
 # Automatically generate documentation pages
 from gendocs import Generator
-Generator().DocumentPackages(wtools, index_base='../../README.rst')
+Generator().DocumentPackages(wtools, index_base='../../README.rst', showinh=True)
 
 
 # -- Project information -----------------------------------------------------

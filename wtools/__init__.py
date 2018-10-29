@@ -3,6 +3,7 @@ from .fileio import *
 from .mesh import *
 from .plots import *
 from .geostats import *
+from .transform import *
 
 __version__ = '0.0.3'
 __author__ = 'Bane Sullivan'
