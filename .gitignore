@@ -2,6 +2,7 @@
 **/*.pyc
 **/__pycache__/
 **/.ipynb_checkpoints/
+**/output/
 .coverage
 coverage.xml
 build/

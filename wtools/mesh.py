@@ -15,6 +15,7 @@ __displayname__ = 'Mesh Tools'
 import numpy as np
 import properties
 
+from .plots import display
 
 def meshgrid(x, y, z=None):
     """Use this convienance method for your meshgrid needs. This ensures that
@@ -143,7 +144,7 @@ def saveUBC(fname, x, y, z, models, header='Data', widths=False, origin=(0.0, 0.
 
     nx, ny, nz = shp
 
-    def _getWidths(nw, w, widths=False):
+    def _getWidths(nw, w, widths=False, z=False):
         # Convert scalars if necessary
         if isinstance(w, (float, int)):
             dw = np.full(nw, w)
@@ -153,13 +154,16 @@ def saveUBC(fname, x, y, z, models, header='Data', widths=False, origin=(0.0, 0.
             dw = w
             return dw, None
         dw = np.diff(w)
-        o = np.min(w)
+        if z:
+            o = np.max(w)
+        else:
+            o = np.min(w)
         return dw, o
 
     # Get proper cell widths
     dx, ox = _getWidths(nx, x, widths=widths)
     dy, oy = _getWidths(ny, y, widths=widths)
-    dz, oz = _getWidths(nz, z, widths=widths)
+    dz, oz = _getWidths(nz, z, widths=widths, z=True)
 
 
     # Check lengths of cell widths against model space shape
@@ -261,6 +265,10 @@ class GriddedData(properties.HasProperties):
     )
 
     @property
+    def keys(self):
+        return list(self.models.keys())
+
+    @property
     def num_nodes(self):
         """Number of nodes (vertices)"""
         return ((len(self.xtensor)+1) * (len(self.ytensor)+1) *
@@ -274,6 +282,18 @@ class GriddedData(properties.HasProperties):
     @property
     def shape(self):
         return ( len(self.xtensor), len(self.ytensor), len(self.ztensor))
+
+    @property
+    def nx(self):
+        return len(self.xtensor)
+
+    @property
+    def ny(self):
+        return len(self.ytensor)
+
+    @property
+    def nz(self):
+        return len(self.ztensor)
 
     @property
     def xnodes(self):
@@ -295,6 +315,13 @@ class GriddedData(properties.HasProperties):
         ox, oy, oz = self.origin
         z = oz + np.cumsum(self.ztensor)
         return np.insert(z, 0, oz)
+
+    @property
+    def bounds(self):
+        """The bounds of the grid"""
+        return (self.xnodes.min(), self.xnodes.max(),
+                self.ynodes.min(), self.ynodes.max(),
+                self.znodes.min(), self.znodes.max())
 
     def getNodePoints(self):
         """Get ALL nodes in the gridded volume as an XYZ point set"""
@@ -328,6 +355,13 @@ class GriddedData(properties.HasProperties):
         self.validate()
         return saveUBC(fname, self.xnodes, self.ynodes, self.znodes, self.models)
 
+    def getDataRange(self, key):
+        """Get the data range for a given model"""
+        data = self.models[key]
+        dmin = np.nanmin(data)
+        dmax = np.nanmax(data)
+        return (dmin, dmax)
+
 
     def validate(self):
         # Check the models
@@ -343,3 +377,68 @@ class GriddedData(properties.HasProperties):
         if self.ztensor is None:
             self.ztensor = np.ones(shp[2])
         return properties.HasProperties.validate(self)
+
+    def __str__(self):
+        """Print this onject as a human readable sting"""
+        self.validate()
+        fmt = ["<%s instance at %s>" % (self.__class__.__name__, id(self))]
+        fmt.append("  Shape: {}".format(self.shape))
+        fmt.append("  Origin: {}".format(tuple(self.origin)))
+        bds = self.bounds
+        fmt.append("  X Bounds: {}".format((bds[0], bds[1])))
+        fmt.append("  Y Bounds: {}".format((bds[2], bds[3])))
+        fmt.append("  Z Bounds: {}".format((bds[4], bds[5])))
+        if self.models is not None:
+            fmt.append("  Models: ({})".format(len(self.models.keys())))
+            for key, val in self.models.items():
+                dl, dh = self.getDataRange(key)
+                fmt.append("    '{}' ({}): ({:.3e}, {:.3e})".format(key, val.dtype, dl, dh))
+        return '\n'.join(fmt)
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __getitem__(self, key):
+        """Get a model of this grid by its string name"""
+        return self.models[key]
+
+    def display(self, plt, key, plane='xy', slc=None, showit=True, **kwargs):
+        plane = plane.lower()
+        # Now exract the plane
+        data = self.models[key]
+        if plane == 'xz' or plane == 'zx':
+            if slc:
+                ind = np.argmin(np.abs(self.ycenters - slc))
+            else:
+                ind = self.ynodes.size // 2 - 1
+            data = data[:, ind, :]
+            pos = 'Y-Slice @ {}'.format(self.ycenters[ind])
+            plt.xlabel('X')
+            plt.ylabel('Z')
+            disp = display(plt, data, x=self.xnodes, y=self.znodes, **kwargs)
+        elif plane == 'xy' or plane == 'yx':
+            if slc:
+                ind = np.argmin(np.abs(self.zcenters - slc))
+            else:
+                ind = self.znodes.size // 2 - 1
+            data = data[:, :, ind]
+            pos = 'Z-Slice @ {}'.format(self.zcenters[ind])
+            plt.xlabel('X')
+            plt.ylabel('Y')
+            disp = display(plt, data, x=self.xnodes, y=self.ynodes, **kwargs)
+        elif plane == 'yz'  or plane == 'zy':
+            if slc:
+                ind = np.argmin(np.abs(self.xcenters - slc))
+            else:
+                ind = self.xnodes.size // 2 - 1
+            data = data[ind, :, :]
+            pos = 'X-Slice @ {}'.format(self.xcenters[ind])
+            plt.xlabel('Y')
+            plt.ylabel('Z')
+            disp = display(plt, data, x=self.ynodes, y=self.znodes, **kwargs)
+        else:
+            raise RuntimeError('Plane ({}) not understood.'.format(plane))
+        plt.axis('image')
+        plt.title('Data Array: {}\n{}'.format(key, pos))
+        if showit: return plt.show()
+        return disp
