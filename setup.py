@@ -21,6 +21,7 @@ setuptools.setup(
     install_requires=[
         'numpy>=1.15',
         'scipy>=1.1',
+        'pandas>=0.23',
         'pillow>=5.2.0',
         'xmltodict>=0.11.0',
         'vectormath>=0.2.0',
