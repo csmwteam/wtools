@@ -30,7 +30,7 @@ copyright = '2018, Bane Sullivan'
 author = 'Bane Sullivan'
 
 # The short X.Y version
-version = '0.0.2'
+version = '0.0.3'
 
 
 # -- General configuration ---------------------------------------------------
