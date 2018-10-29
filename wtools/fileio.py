@@ -7,6 +7,8 @@ __all__ = [
     'readSGeMSGrid',
 ]
 
+__displayname__ = 'File I/O'
+
 import pandas as pd
 import numpy as np
 
