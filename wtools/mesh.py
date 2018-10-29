@@ -227,7 +227,7 @@ class GriddedData(properties.HasProperties):
         True
 
     Note:
-        See example Jupyter notebooks under the `examples` directory
+        See Jupyter notebooks under the ``examples`` directory
 
     """
     models = properties.Dictionary(
@@ -266,6 +266,7 @@ class GriddedData(properties.HasProperties):
 
     @property
     def keys(self):
+        """List of the string names for each of the models"""
         return list(self.models.keys())
 
     @property
@@ -281,18 +282,22 @@ class GriddedData(properties.HasProperties):
 
     @property
     def shape(self):
+        """3D shape of the grid (number of cells in all three directions)"""
         return ( len(self.xtensor), len(self.ytensor), len(self.ztensor))
 
     @property
     def nx(self):
+        """Number of cells in the X direction"""
         return len(self.xtensor)
 
     @property
     def ny(self):
+        """Number of cells in the Y direction"""
         return len(self.ytensor)
 
     @property
     def nz(self):
+        """Number of cells in the Z direction"""
         return len(self.ztensor)
 
     @property
@@ -379,7 +384,7 @@ class GriddedData(properties.HasProperties):
         return properties.HasProperties.validate(self)
 
     def __str__(self):
-        """Print this onject as a human readable sting"""
+        """Print this onject as a human readable string"""
         self.validate()
         fmt = ["<%s instance at %s>" % (self.__class__.__name__, id(self))]
         fmt.append("  Shape: {}".format(self.shape))
@@ -403,6 +408,15 @@ class GriddedData(properties.HasProperties):
         return self.models[key]
 
     def display(self, plt, key, plane='xy', slc=None, showit=True, **kwargs):
+        """Display a 2D slice of this grid.
+
+        Args:
+            plt (handle): the active plotting handle to use
+            key (str): the string name of the model to view
+            plane (``'xy'``, ``'xz'``, ``'yz'``): The plane to slice upon
+            slc (float): the coordinate along the sliced dimension
+            showit (bool): A flag for whether or not to call ``plt.show()``
+        """
         plane = plane.lower()
         # Now exract the plane
         data = self.models[key]

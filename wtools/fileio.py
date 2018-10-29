@@ -43,6 +43,17 @@ def readGSLib(fname):
 
 def tableToGrid(df, shp, origin=[0.0, 0.0, 0.0], spacing=[1.0, 1.0, 1.0], order='F'):
     """Converts a pandas ``DataFrame`` table to a ``GriddedData`` object.
+
+    Args:
+        shp (tuple(int)): length 3 tuple of integers sizes for the data grid
+            dimensions.
+        origin (iter(float)): the southwest-bottom corner of the grid.
+        spacing (iter(float)): the cell spacings for each axial direction.
+        order (``'C'``, ``'F'``, ``'A'``), optional: the reshape order.
+
+    Return:
+        GriddedData:
+            The data table loaded onto a ``GriddedData`` object.
     """
     if not isinstance(shp, (list, tuple)) or len(shp) != 3:
         raise RuntimeError('`shp` must be a length 3 tuple.')
@@ -73,6 +84,8 @@ def readSGeMSGrid(fname, origin=[0.0, 0.0, 0.0], spacing=[1.0, 1.0, 1.0]):
     Args:
         fname (str): the string file name of the data to load. This can be a
             relative or abslute file path.
+        origin (iter(float)): the southwest-bottom corner of the grid.
+        spacing (iter(float)): the cell spacings for each axial direction
 
     Return:
         GriddedData:
