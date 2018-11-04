@@ -16,6 +16,14 @@ from .plots import display
 from .fileio import GridFileIO
 
 
+def getDataRange(data):
+    """Get the data range for a given ndarray"""
+    dmin = np.nanmin(data)
+    dmax = np.nanmax(data)
+    return (dmin, dmax)
+
+
+
 class Grid(properties.HasProperties, GridFileIO):
     """A data structure to store a model space discretization and different
     attributes of that model space.
@@ -43,7 +51,8 @@ class Grid(properties.HasProperties, GridFileIO):
         key_prop=properties.String('Model name'),
         value_prop=properties.Array(
             'The volumetric data as a 3D NumPy array in <X,Y,Z> or <i,j,k> coordinates.',
-            shape=('*','*','*'))
+            shape=('*','*','*')),
+        required=False
     )
 
     xtensor = properties.Array(
@@ -163,10 +172,7 @@ class Grid(properties.HasProperties, GridFileIO):
     def getDataRange(self, key):
         """Get the data range for a given model"""
         data = self.models[key]
-        dmin = np.nanmin(data)
-        dmax = np.nanmax(data)
-        return (dmin, dmax)
-
+        return getDataRange(data)
 
     def validate(self):
         # Check the models
@@ -209,6 +215,40 @@ class Grid(properties.HasProperties, GridFileIO):
 
     def __repr__(self):
         return self.__str__()
+
+    def _repr_markdown_(self):
+        self.validate()
+        fmt = []
+        if self.models is not None:
+            fmt.append("<table>")
+            fmt.append("<tr><th>Grid Attributes</th><th>Models</th></tr>")
+            fmt.append("<tr><td>")
+        fmt.append("")
+        fmt.append("| Attribute | Values        |")
+        fmt.append("|-----------|---------------|")
+        fmt.append("| Shape | {} |".format(self.shape))
+        fmt.append("| Origin | {} |".format(tuple(self.origin)))
+        bds = self.bounds
+        fmt.append("| X Bounds | {} |".format((bds[0], bds[1])))
+        fmt.append("| Y Bounds | {} |".format((bds[2], bds[3])))
+        fmt.append("| Z Bounds | {} |".format((bds[4], bds[5])))
+        num = 0
+        if self.models is not None:
+            num = len(self.models.keys())
+        fmt.append("| Models | {} |".format(num))
+        fmt.append("")
+        if self.models is not None:
+            fmt.append("</td><td>")
+            fmt.append("")
+            fmt.append("| Name | Type | Min | Max |")
+            fmt.append("|------|------|-----|-----|")
+            for key, val in self.models.items():
+                dl, dh = self.getDataRange(key)
+                fmt.append("| `'{}'` | `{}` | {:.3e} | {:.3e} |".format(key, val.dtype, dl, dh))
+            fmt.append("")
+            fmt.append("</td></tr> </table>")
+        return '\n'.join(fmt)
+
 
     def __getitem__(self, key):
         """Get a model of this grid by its string name"""
