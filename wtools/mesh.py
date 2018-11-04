@@ -216,38 +216,43 @@ class Grid(properties.HasProperties, GridFileIO):
     def __repr__(self):
         return self.__str__()
 
-    def _repr_markdown_(self):
+    def _repr_html_(self):
         self.validate()
-        fmt = []
+        fmt = ""
         if self.models is not None:
-            fmt.append("<table>")
-            fmt.append("<tr><th>Grid Attributes</th><th>Models</th></tr>")
-            fmt.append("<tr><td>")
-        fmt.append("")
-        fmt.append("| Attribute | Values        |")
-        fmt.append("|-----------|---------------|")
-        fmt.append("| Shape | {} |".format(self.shape))
-        fmt.append("| Origin | {} |".format(tuple(self.origin)))
+            fmt += "<table>"
+            fmt += "<tr><th>Grid Attributes</th><th>Models</th></tr>"
+            fmt += "<tr><td>"
+        fmt += "\n"
+        fmt += "<table>\n"
+        fmt += "<tr><th>Attribute</th><th>Values</th></tr>\n"
+        row = "<tr><td>{}</td><td>{}</td></tr>\n"
+        fmt += row.format("Shape", self.shape)
+        fmt += row.format('Origin', tuple(self.origin))
         bds = self.bounds
-        fmt.append("| X Bounds | {} |".format((bds[0], bds[1])))
-        fmt.append("| Y Bounds | {} |".format((bds[2], bds[3])))
-        fmt.append("| Z Bounds | {} |".format((bds[4], bds[5])))
+        fmt += row.format("X Bounds", (bds[0], bds[1]))
+        fmt += row.format("Y Bounds", (bds[2], bds[3]))
+        fmt += row.format("Z Bounds", (bds[4], bds[5]))
         num = 0
         if self.models is not None:
             num = len(self.models.keys())
-        fmt.append("| Models | {} |".format(num))
-        fmt.append("")
+        fmt += row.format("Models", num)
+        fmt += "</table>\n"
+        fmt += "\n"
         if self.models is not None:
-            fmt.append("</td><td>")
-            fmt.append("")
-            fmt.append("| Name | Type | Min | Max |")
-            fmt.append("|------|------|-----|-----|")
+            fmt += "</td><td>"
+            fmt += "\n"
+            fmt += "<table>\n"
+            row = "<tr><th>{}</th><th>{}</th><th>{}</th><th>{}</th></tr>\n"
+            fmt += row.format("Name", "Type", "Min", "Max")
+            row = "<tr><td>{}</td><td>{}</td><td>{:.3e}</td><td>{:.3e}</td></tr>\n"
             for key, val in self.models.items():
                 dl, dh = self.getDataRange(key)
-                fmt.append("| `'{}'` | `{}` | {:.3e} | {:.3e} |".format(key, val.dtype, dl, dh))
-            fmt.append("")
-            fmt.append("</td></tr> </table>")
-        return '\n'.join(fmt)
+                fmt += row.format(key, val.dtype, dl, dh)
+            fmt += "</table>\n"
+            fmt += "\n"
+            fmt += "</td></tr> </table>"
+        return fmt
 
 
     def __getitem__(self, key):
