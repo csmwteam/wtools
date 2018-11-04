@@ -9,6 +9,7 @@ __all__ = [
 __displayname__ = 'Mesh Tools'
 
 import numpy as np
+import pandas as pd
 import properties
 
 from .plots import display
@@ -212,6 +213,19 @@ class Grid(properties.HasProperties, GridFileIO):
     def __getitem__(self, key):
         """Get a model of this grid by its string name"""
         return self.models[key]
+
+    def toDataFrame(self, order='C'):
+        """Returns the models in this Grid to a Pandas DataFrame with all arrays
+        flattened in the specified order. A header attribute is added to the
+        DataFrame to specified the grid extents. Much metadata is lost in this
+        conversion.
+        """
+        self.validate()
+        tits = self.models.keys()
+        data = {k: v.flatten(order=order) for k, v in self.models.items()}
+        df = pd.DataFrame.from_dict(data)
+        df.header = '{} {} {}'.format(self.nx, self.ny, self.nz)
+        return df
 
     def display(self, plt, key, plane='xy', slc=None, showit=True, **kwargs):
         """Display a 2D slice of this grid.

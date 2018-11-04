@@ -5,23 +5,27 @@ directly into the `Grid` class.
 
 __all__ = [
     'readGSLib',
+    'saveGSLib',
 ]
 
 __displayname__ = 'File I/O'
 
 import pandas as pd
 import numpy as np
-import glob, os
+import glob
+import os
+import warnings
+import datetime
 
 from .transform import transpose
 
 
-def readGSLib(fname):
+def readGSLib(filename):
     """This will read a standard GSLib or GeoEAS data file to a pandas
     ``DataFrame``.
 
     Args:
-        fname (str): the string file name of the data to load. This can be a
+        filename (str): the string file name of the data to load. This can be a
             relative or abslute file path.
 
     Return:
@@ -30,7 +34,7 @@ def readGSLib(fname):
             called ``header`` is added to the data frame contianing the string
             header line of the file.
     """
-    with open(fname, 'r') as f:
+    with open(filename, 'r') as f:
         head = f.readline().strip()
         num = int(f.readline().strip())
         ts = []
@@ -41,6 +45,27 @@ def readGSLib(fname):
                          delim_whitespace=True)
         df.header = head
     return df
+
+
+def saveGSLib(filename, dataframe, header=None):
+    """This will save a pandas dataframe to a GSLib file"""
+    if header is None:
+        try:
+            header = dataframe.header
+        except AttributeError:
+            warnings.warn('Header not defined. Using date')
+            header = str(datetime.datetime.now())
+    if '\n' in header:
+        raise RuntimeError('`header` can only be 1 line.')
+    datanames = '\n'.join(dataframe.columns)
+    with open(filename, 'w') as f:
+        f.write('%s\n' % header)
+        f.write('%d\n' % len(dataframe.columns))
+        f.write(datanames)
+        f.write('\n')
+        dataframe.to_csv(f, sep=' ', header=None, index=False, float_format='%.9e')
+    return 1
+
 
 
 class GridFileIO(object):
@@ -175,7 +200,6 @@ class GridFileIO(object):
             if m.shape != shp:
                 raise RuntimeError('dimension mismatch in models.')
 
-
         nx, ny, nz = shp
 
         def _getWidths(nw, w, widths=False, z=False):
@@ -199,7 +223,6 @@ class GridFileIO(object):
         dy, oy = _getWidths(ny, y, widths=widths)
         dz, oz = _getWidths(nz, z, widths=widths, z=True)
 
-
         # Check lengths of cell widths against model space shape
         if len(dx) != nx:
             raise RuntimeError('X cells size does not match data.')
@@ -207,7 +230,6 @@ class GridFileIO(object):
             raise RuntimeError('Y cells size does not match data.')
         if len(dz) != nz:
             raise RuntimeError('Z cells size does not match data.')
-
 
         # Check the origin
         if widths:
@@ -217,8 +239,6 @@ class GridFileIO(object):
             if ox is None: ox = origin[0]
             if oy is None: oy = origin[1]
             if oz is None: oz = origin[2]
-
-
 
         # Perfrom the write out:
         if '.msh' not in fname:
@@ -242,7 +262,7 @@ class GridFileIO(object):
                 f.write('! %s\n' % ('Data name: %s' % name))
                 f.write('%s\n' % '\n'.join(map(str, transpose(data).flatten())))
 
-        return None
+        return 1
 
 
     def saveUBC(self, fname):
@@ -379,3 +399,8 @@ class GridFileIO(object):
         grid.models = models
         grid.validate()
         return grid
+
+    def saveSGeMS(Grid, filename):
+        """This will save the grid in the SGeMS gridded data file format"""
+        df = Grid.toDataFrame(order='F')
+        return saveGSLib(filename, df)
