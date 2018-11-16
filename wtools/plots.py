@@ -11,6 +11,7 @@ __displayname__ = 'Plotting Routines'
 
 import numpy as np
 
+from .geostats import GridSpec
 
 def display(plt, arr, x=None, y=None, **kwargs):
     """This provides a convienant class for plotting 2D arrays that avoids
@@ -42,7 +43,7 @@ def display(plt, arr, x=None, y=None, **kwargs):
 
 
 
-def plotStructGrid(plt, outStruct, gridspecs, imeas=None):
+def plotStructGrid(plt, outStruct, gridspecs=None, imeas=None):
     """Plot a semivariogram or covariogram produced from raster2structgrid
 
     Args:
@@ -59,6 +60,12 @@ def plotStructGrid(plt, outStruct, gridspecs, imeas=None):
         plt.plot or plt.pcolor
 
     """
+    nDim = outStruct.ndim
+    # create the gridspecs if needed
+    if gridspecs is None:
+        gridspecs = []
+        for i in range(nDim):
+            gridspecs.append(GridSpec(n=outStruct.shape[i]))
     # Check that gridspecs is a list of ``GridSpec`` objects
     if not isinstance(gridspecs, list):
         if not isinstance(gridspecs, GridSpec):
@@ -66,7 +73,6 @@ def plotStructGrid(plt, outStruct, gridspecs, imeas=None):
         gridspecs = [gridspecs] # Make sure we have a list to index if only 1D
 
     # Check the `GridSpec` objects and ensure they have an ``nnodes``
-    nDim = outStruct.ndim
     if nDim != len(gridspecs):
         raise RuntimeError('Number of data dimensions does not match given gridspecs.')
     for i, gs in enumerate(gridspecs):

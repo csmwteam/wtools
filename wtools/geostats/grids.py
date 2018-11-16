@@ -18,10 +18,16 @@ class GridSpec(properties.HasProperties):
     If you have a 3D grid then you will have 3 ``GridSpec`` objects.
     """
     n = properties.Integer('The number of components along this dimension.')
-    min = properties.Integer('The minimum value along this dimension. The origin.')
-    sz = properties.Integer('The uniform cell size along this dimension.')
+    min = properties.Integer('The minimum value along this dimension. The origin.', default=0)
+    sz = properties.Integer('The uniform cell size along this dimension.', default=1)
     nnodes = properties.Integer('The number of grid nodes to consider on either \
         side of the origin in the output map', required=False)
+
+    @properties.validator
+    def _validate_nnodes(self):
+        if self.nnodes is None:
+            self.nnodes = self.n // 2
+        return True
 
 
 ################################################################################
