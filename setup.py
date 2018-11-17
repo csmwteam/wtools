@@ -26,6 +26,7 @@ setuptools.setup(
         'xmltodict>=0.11.0',
         'vectormath>=0.2.0',
         'properties>=0.5.2',
+        'discretize>=0.3.4',
     ],
     classifiers=(
         "Programming Language :: Python",
