@@ -1,6 +1,9 @@
 W-Tools
 =======
 
+.. image:: https://travis-ci.org/csmwteam/wtools.svg?branch=master
+   :target: https://travis-ci.org/csmwteam/wtools
+
 .. image:: https://readthedocs.org/projects/wtools/badge/?version=latest
    :target: https://wtools.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation Status
