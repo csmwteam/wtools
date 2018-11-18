@@ -117,8 +117,8 @@ def raster_to_struct_grid(datain, imeas='covar', rtol=1e-10):
     unpad_list = [np.arange(*l) for l in unpad_ind]
     unpad_coord = np.meshgrid(*unpad_list, indexing='ij')
 
-    outStruct=np.fft.fftshift(outStruct)[unpad_coord]
-    outNpairs=np.fft.fftshift(outNpairs)[unpad_coord]
+    outStruct=np.fft.fftshift(outStruct)[tuple(unpad_coord)]
+    outNpairs=np.fft.fftshift(outNpairs)[tuple(unpad_coord)]
 
     indzeros = outNpairs<(np.max(outNpairs)*rtol)
     outStruct[indzeros] = np.nan
