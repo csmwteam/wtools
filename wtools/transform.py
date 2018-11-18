@@ -5,7 +5,7 @@ transforming NumPy arrays in a Cartesian coordinate system.
 __all__ = [
     'meshgrid',
     'transpose',
-    'emptyArray',
+    'empty_array',
 ]
 
 
@@ -66,13 +66,13 @@ def transpose(arr):
     return np.flip(np.swapaxes(arr, 0, 1), 2)
 
 
-def emptyArray(shp):
+def empty_array(shp, **kwargs):
     """Creates a NumPy ndarray of the given shape that is gaurnteed to be
     initialized to all NaN values
 
     Args:
         shp (tuple(int)): A tuple of integers specifiy the shape of the array
     """
-    arr = np.empty(shp)
+    arr = np.empty(shp, **kwargs)
     arr[:] = np.nan
     return arr

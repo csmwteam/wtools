@@ -4,7 +4,7 @@ our spatially referenced data in logical, consistant ways across projects.
 
 __all__ = [
     'display',
-    'plotStructGrid',
+    'plot_struct_grid',
 ]
 
 __displayname__ = 'Plotting Routines'
@@ -43,8 +43,8 @@ def display(plt, arr, x=None, y=None, **kwargs):
 
 
 
-def plotStructGrid(plt, outStruct, gridspecs=None, imeas=None):
-    """Plot a semivariogram or covariogram produced from raster2structgrid
+def plot_struct_grid(plt, outStruct, gridspecs=None, imeas=None):
+    """Plot a semivariogram or covariogram produced from raster_to_struct_grid
 
     Args:
         plt (handle): An active plotting handle. This allows us to use the

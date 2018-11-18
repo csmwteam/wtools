@@ -1,7 +1,7 @@
 __all__ = [
     'GridSpec',
-    'geoeas2numpy',
-    'geoeas2numpyGS',
+    'geoeas_to_np',
+    'geoeas_to_npGS',
 ]
 
 __displayname__ = 'Grids'
@@ -33,7 +33,7 @@ class GridSpec(properties.HasProperties):
 ################################################################################
 
 
-def geoeas2numpy(datain, nx, ny=None, nz=None):
+def geoeas_to_np(datain, nx, ny=None, nz=None):
     """Transform GeoEas array into np.ndarray to be treated like image.
     Function to transform a SINGLE GoeEas-formatted raster (datain)
     i.e., a single column, to a NumPy array that can be viewed using
@@ -80,11 +80,11 @@ def geoeas2numpy(datain, nx, ny=None, nz=None):
         tmp = np.swapaxes(tmp, 1,0,2) # TODO: should we do this???
         return tmp[ny:1:-1,:,:] # TODO: should we do this???
     # Uh-oh.
-    raise RuntimeError('``geoeas2numpy``: arguments not understood.')
+    raise RuntimeError('``geoeas_to_np``: arguments not understood.')
 
 
-def geoeas2numpyGS(datain, gridspecs):
-    """A wrapper for ``geoeas2numpy`` to handle a list of ``GridSpec`` objects
+def geoeas_to_npGS(datain, gridspecs):
+    """A wrapper for ``geoeas_to_np`` to handle a list of ``GridSpec`` objects
 
     Args:
         gridspecs (list(GridSpec)): array with grid specifications using
@@ -96,9 +96,9 @@ def geoeas2numpyGS(datain, gridspecs):
             raise RuntimeError('gridspecs arguments ({}) improperly defined.'. format(gridspecs))
         gridspecs = [gridspecs] # Make sure we have a list to index if only 1D
     if len(gridspecs) == 1:
-        return geoeas2numpy(datain, nx=gridspecs[0].n)
+        return geoeas_to_np(datain, nx=gridspecs[0].n)
     elif len(gridspecs) == 2:
-        return geoeas2numpy(datain, nx=gridspecs[0].n, ny=gridspecs[1].n)
+        return geoeas_to_np(datain, nx=gridspecs[0].n, ny=gridspecs[1].n)
     elif len(gridspecs) == 3:
-        return geoeas2numpy(datain, nx=gridspecs[0].n, ny=gridspecs[1].n, nz=gridspecs[2].n)
+        return geoeas_to_np(datain, nx=gridspecs[0].n, ny=gridspecs[1].n, nz=gridspecs[2].n)
     raise RuntimeError('gridspecs must be max of length 3 for geoas2numpy.')

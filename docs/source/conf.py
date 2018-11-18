@@ -20,7 +20,7 @@ sys.path.insert(0, '/Users/bane/Documents/OpenGeoVis/Software/gendocs/')
 import wtools
 # Automatically generate documentation pages
 from gendocs import Generator
-Generator().DocumentPackages(wtools, index_base='../../README.rst', showinh=True)
+Generator().DocumentPackages(wtools, index_base='../../README.rst', showinh=False)
 
 
 # -- Project information -----------------------------------------------------
@@ -175,6 +175,7 @@ texinfo_documents = [
 intersphinx_mapping = {'https://docs.python.org/': None,
                        'http://docs.scipy.org/doc/numpy/': None,
                        'http://propertiespy.readthedocs.io/en/latest/': None,
+                       'http://discretize.simpeg.xyz/en/latest/': None
                       }
 
 # -- Options for todo extension ----------------------------------------------

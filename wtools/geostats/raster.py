@@ -3,7 +3,7 @@ as making variogram or covariograms.
 """
 
 __all__ = [
-    'raster2structgrid',
+    'raster_to_struct_grid',
     'suprts2modelcovFFT',
 ]
 
@@ -12,14 +12,14 @@ __displayname__ = 'Rasters'
 import numpy as np
 
 
-def raster2structgrid(datain, imeas='covar', rtol=1e-10):
+def raster_to_struct_grid(datain, imeas='covar', rtol=1e-10):
     """Create an auto-variogram or auto-covariance map from 1D or 2D rasters.
     This computes auto-variogram or auto-covariance maps from
     1D or 2D rasters. This function computes variograms/covariances in the
     frequency domain via the Fast Fourier Transform (``np.fftn``).
 
     Note:
-        For viewing the results, please use the ``plotStructGrid`` method
+        For viewing the results, please use the ``plot_struct_grid`` method
         from the ``plots`` module.
 
     Note:

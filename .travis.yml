@@ -1,14 +1,15 @@
 language: python
 os:
-- linux
+  - linux
 python:
-- 2.7
-- 3.6
+  - 3.6 # only test on 3.6 and save notebook outputs on 3.6
 sudo: false
 install:
-- pip install -r requirements.txt
+  - pip install -r requirements.txt
+  - pip install git+https://github.com/simpeg/discretize/tree/feat/vtk.git
 script:
-- python -m wtools test
+  - cd examples
+  - sh ./test.sh
 notifications:
   email:
     recipients:

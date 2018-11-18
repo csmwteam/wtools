@@ -4,8 +4,9 @@ directly into the `Grid` class.
 """
 
 __all__ = [
-    'readGSLib',
-    'saveGSLib',
+    'read_gslib',
+    'save_gslib',
+    'GridFileIO',
 ]
 
 __displayname__ = 'File I/O'
@@ -22,7 +23,7 @@ import discretize
 from .transform import transpose
 
 
-def readGSLib(filename):
+def read_gslib(filename):
     """This will read a standard GSLib or GeoEAS data file to a pandas
     ``DataFrame``.
 
@@ -49,7 +50,7 @@ def readGSLib(filename):
     return df
 
 
-def saveGSLib(filename, dataframe, header=None):
+def save_gslib(filename, dataframe, header=None):
     """This will save a pandas dataframe to a GSLib file"""
     if header is None:
         try:
@@ -71,9 +72,21 @@ def saveGSLib(filename, dataframe, header=None):
 
 
 class GridFileIO(object):
+    """
+    This class is inherrited by the :class:`~wtools.mesh.Grid` class and all
+    these methods should be called from :class:`~wtools.mesh.Grid`.
+    For example, If you have a file to read:
+
+    Example:
+        >>> import wtools
+        >>> grid = wtools.Grid.read_sgems_grid('path/to/data/file.sgems')
+        >>> grid.validate()
+        True
+
+    """
 
     @classmethod
-    def tableToGrid(Grid, df, shp, origin=[0.0, 0.0, 0.0], spacing=[1.0, 1.0, 1.0], order='F'):
+    def table_to_grid(Grid, df, shp, origin=[0.0, 0.0, 0.0], spacing=[1.0, 1.0, 1.0], order='F'):
         """Converts a pandas ``DataFrame`` table to a ``Grid`` object.
 
         Args:
@@ -108,7 +121,7 @@ class GridFileIO(object):
         return grid
 
     @classmethod
-    def readSGeMSGrid(Grid, fname, origin=[0.0, 0.0, 0.0], spacing=[1.0, 1.0, 1.0]):
+    def read_sgems_grid(Grid, fname, origin=[0.0, 0.0, 0.0], spacing=[1.0, 1.0, 1.0]):
         """Reads an SGeMS grid file where grid shape is defined in the header as
         three integers seperated by whitespace. Data arrays are treated as 3D and
         given in <x, y, z> indexing to a ``Grid`` object.
@@ -124,16 +137,16 @@ class GridFileIO(object):
                 The SGeMS data loaded onto a ``Grid`` object.
 
         """
-        df = readGSLib(fname)
+        df = read_gslib(fname)
         shp = df.header.split()
         shp = [int(i) for i in shp]
-        return Grid.tableToGrid(df, shp, origin=origin, spacing=spacing)
+        return Grid.table_to_grid(df, shp, origin=origin, spacing=spacing)
 
 
-    def saveSGeMS(self, filename):
+    def save_sgems(self, filename):
         """This will save the grid in the SGeMS gridded data file format"""
-        df = self.toDataFrame(order='F')
-        return saveGSLib(filename, df)
+        df = self.to_data_frame(order='F')
+        return save_gslib(filename, df)
 
 
     @classmethod

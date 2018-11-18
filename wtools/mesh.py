@@ -17,7 +17,7 @@ from .plots import display
 from .fileio import GridFileIO
 
 
-def getDataRange(data):
+def get_data_range(data):
     """Get the data range for a given ndarray"""
     dmin = np.nanmin(data)
     dmax = np.nanmax(data)
@@ -26,7 +26,8 @@ def getDataRange(data):
 
 
 class Grid(discretize.TensorMesh, GridFileIO):
-    """A data structure to store a model space discretization and different
+    """
+    A data structure to store a model space discretization and different
     attributes of that model space.
 
     Example:
@@ -112,10 +113,10 @@ class Grid(discretize.TensorMesh, GridFileIO):
         return (x0,x1, y0,y1, z0,z1)
 
 
-    def getDataRange(self, key):
+    def get_data_range(self, key):
         """Get the data range for a given model"""
         data = self.models[key]
-        return getDataRange(data)
+        return get_data_range(data)
 
     def equal(self, other):
         """Compare this Grid to another Grid"""
@@ -124,7 +125,7 @@ class Grid(discretize.TensorMesh, GridFileIO):
     def __str__(self):
         """Print this onject as a human readable string"""
         self.validate()
-        fmt = ["<%s instance at %s>" % (self.__class__.__name__, id(self))]
+        fmt = ["<%s instance>" % (self.__class__.__name__)]
         fmt.append("  Shape: {}".format(self.shape))
         fmt.append("  Origin: {}".format(tuple(self.x0)))
         bds = self.bounds
@@ -134,7 +135,7 @@ class Grid(discretize.TensorMesh, GridFileIO):
         if self.models is not None:
             fmt.append("  Models: ({})".format(len(self.models.keys())))
             for key, val in self.models.items():
-                dl, dh = self.getDataRange(key)
+                dl, dh = self.get_data_range(key)
                 fmt.append("    '{}' ({}): ({:.3e}, {:.3e})".format(key, val.dtype, dl, dh))
         return '\n'.join(fmt)
 
@@ -172,7 +173,7 @@ class Grid(discretize.TensorMesh, GridFileIO):
             fmt += row.format("Name", "Type", "Min", "Max")
             row = "<tr><td>{}</td><td>{}</td><td>{:.3e}</td><td>{:.3e}</td></tr>\n"
             for key, val in self.models.items():
-                dl, dh = self.getDataRange(key)
+                dl, dh = self.get_data_range(key)
                 fmt += row.format(key, val.dtype, dl, dh)
             fmt += "</table>\n"
             fmt += "\n"
@@ -184,7 +185,7 @@ class Grid(discretize.TensorMesh, GridFileIO):
         """Get a model of this grid by its string name"""
         return self.models[key]
 
-    def toDataFrame(self, order='C'):
+    def to_data_frame(self, order='C'):
         """Returns the models in this Grid to a Pandas DataFrame with all arrays
         flattened in the specified order. A header attribute is added to the
         DataFrame to specified the grid extents. Much metadata is lost in this
@@ -203,6 +204,16 @@ class Grid(discretize.TensorMesh, GridFileIO):
         return discretize.TensorMesh.plot_3d_slicer(self, model, **kwargs)
 
     def plotSlice(self, key, **kwargs):
+        """Plots a 2D slice of the mesh
+
+        Args:
+            key (str): the model name to plot
+
+        Note:
+            See the `discretize code docs`_ for more details.
+
+        .. _discretize code docs: http://discretize.simpeg.xyz/en/latest/content/mesh_tensor.html?highlight=plotSlice#discretize.View.TensorView.plotSlice
+        """
         return discretize.TensorMesh.plotSlice(self, v=self.models[key], **kwargs)
 
     @property
