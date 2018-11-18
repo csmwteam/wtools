@@ -6,7 +6,7 @@ python:
 sudo: false
 install:
   - pip install -r requirements.txt
-  - pip install git+https://github.com/simpeg/discretize/tree/feat/vtk.git
+  - pip install git+https://github.com/simpeg/discretize/@feat/vtk
 script:
   - cd examples
   - sh ./test.sh
