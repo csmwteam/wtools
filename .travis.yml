@@ -9,6 +9,7 @@ install:
   - pip install git+https://github.com/simpeg/discretize/@feat/vtk
 script:
   - cd examples
+  - mkdir output
   - sh ./test.sh
 notifications:
   email:
