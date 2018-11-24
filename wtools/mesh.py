@@ -81,7 +81,7 @@ class Grid(discretize.TensorMesh, GridFileIO):
             shp = list(self.models.values())[0].shape
             for k, d in self.models.items():
                 if d.shape != shp:
-                    raise properties.ValidationError('Validation Failed: dimesnion mismatch between models.')
+                    raise RuntimeError('Validation Failed: dimesnion mismatch between models.')
         return True
 
     @property

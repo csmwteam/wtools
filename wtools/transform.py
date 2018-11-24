@@ -6,6 +6,7 @@ __all__ = [
     'meshgrid',
     'transpose',
     'empty_array',
+    'logscale'
 ]
 
 
@@ -73,6 +74,14 @@ def empty_array(shp, **kwargs):
     Args:
         shp (tuple(int)): A tuple of integers specifiy the shape of the array
     """
-    arr = np.empty(shp, **kwargs)
-    arr[:] = np.nan
-    return arr
+    return np.full(shp, np.nan, **kwargs)
+
+
+def logscale(arr, base10=False):
+    """Take the natural log of the absolute value of the array plus one:
+
+    >>> np.log(np.abs(arr)+1)
+    """
+    if base10:
+        return np.log10(np.abs(arr)+1)
+    return np.log(np.abs(arr)+1)
