@@ -12,6 +12,7 @@ import pandas as pd
 import properties
 import json
 import pickle
+import copy
 
 
 def mapTable(table, arr, to_dict=True, index=None):
@@ -23,7 +24,7 @@ def mapTable(table, arr, to_dict=True, index=None):
     if index is None:
         index = table.keys()[0]
     table.set_index(index)
-    ntbl = table[table.keys()].iloc[arr]
+    ntbl = table[table.keys()].loc[arr]
     if to_dict:
         d = {}
         for k in ntbl.columns:
@@ -132,3 +133,14 @@ class TimeModels(Models):
         for k in self.keys():
             df[k] = self[k, idx].flatten(order='f')
         return df
+
+    def applyMethod(self, method, inplace=True):
+        mods = self
+        if not inplace:
+            mods = copy.deepcopy(self)
+        for key, data in mods._models.items():
+            for i, arr in enumerate(data):
+                data[i] = method(arr)
+            mods._models[key] = data
+        if not inplace:
+            return mods
