@@ -7,6 +7,7 @@ __all__ = [
     'read_gslib',
     'save_gslib',
     'GridFileIO',
+    'load_models',
 ]
 
 __displayname__ = 'File I/O'
@@ -21,6 +22,7 @@ import json
 import discretize
 
 from .transform import transpose
+from .models import Models
 
 
 def read_gslib(filename):
@@ -170,3 +172,18 @@ class GridFileIO(object):
         for k,v in self.models.items():
             d['%s_%s.ubc' % (fileName.replace(ext, ''), k)] = v
         return discretize.TensorMesh.writeUBC(self, fileName, models=d, directory=directory, comment_lines=comment_lines)
+
+
+
+def load_models(filename):
+    """
+    Open a json file and loads the models into the target class
+    As long as there are no namespace conflicts, the target __class__
+    will be stored on the properties.HasProperties registry and may be
+    fetched from there.
+    :param str filename: name of file to read in
+    """
+    with open(filename, 'r') as infile:
+        jsondict = json.load(infile)
+        data = Models.deserialize(jsondict, trusted=True)
+    return data

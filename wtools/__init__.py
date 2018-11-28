@@ -4,6 +4,7 @@ from .mesh import *
 from .plots import *
 from .geostats import *
 from .transform import *
+from .models import *
 
 __version__ = '0.0.4'
 __author__ = 'Bane Sullivan'
