@@ -8,21 +8,38 @@ __all__ = [
     'save_gslib',
     'GridFileIO',
     'load_models',
+    'save_pickle',
+    'load_pickle',
 ]
 
 __displayname__ = 'File I/O'
 
 import pandas as pd
 import numpy as np
+
 import glob
 import os
 import warnings
 import datetime
 import json
+import pickle
+
 import discretize
 
 from .transform import transpose
 from .models import Models
+
+
+def save_pickle(filename, data):
+    """Pickles a data object in a Python 2 AND 3 friendly manner"""
+    with open(filename, 'wb') as f:
+        pickle.dump(data, f, protocol=2)
+
+def load_pickle(filename):
+    """Reads a pickled data object"""
+    with open(filename, 'rb' ) as f:
+        obj = pickle.load(f)
+    return obj
 
 
 def read_gslib(filename):

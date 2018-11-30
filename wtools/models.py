@@ -11,7 +11,6 @@ import numpy as np
 import pandas as pd
 import properties
 import json
-import pickle
 import copy
 
 
@@ -76,13 +75,6 @@ class Models(properties.HasProperties):
             json.dump(self.serialize(), f)
         return filename
 
-    def pickle(self, filename):
-        with open(filename, 'wb') as f:
-            pickle.dump(self, f)
-
-    @staticmethod
-    def load_pickle(filename):
-        return pickle.load( open(filename, 'rb' ) )
 
 
 
